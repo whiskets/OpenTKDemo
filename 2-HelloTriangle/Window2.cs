@@ -10,13 +10,13 @@ using System;
 
 namespace LearnOpenTK
 {
-    [StructLayout(LayoutKind.Explicit, Size = 16)]
+    [StructLayout(LayoutKind.Explicit, Size = 32)]
     struct TestVertex
     {
         [FieldOffset(0)]
         public Vector3 Vertieces;
-        [FieldOffset(12)]
-        public int Id;
+        [FieldOffset(16)]
+        public int[] Id;
     }
 
     // Be warned, there is a LOT of stuff here. It might seem complicated, but just take it slow and you'll be fine.
@@ -56,7 +56,8 @@ namespace LearnOpenTK
             {
                 TestVertex a =new TestVertex();
                 a.Vertieces = new Vector3(floorVertices[i], floorVertices[i + 1], floorVertices[i + 2]);
-                a.Id = i / 9 + 1;            
+                var id = i / 9 + 1;
+                a.Id = new[] { id, id + 1, id + 2, id + 3 };            
                 _vertices[i/3] = a;
             }
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
@@ -71,9 +72,11 @@ namespace LearnOpenTK
                // GL.BufferData(BufferTarget.ArrayBuffer, floorVertices.Length * sizeof(float), floorVertices, BufferUsageHint.StaticDraw);
                 _vertexArrayObject = GL.GenVertexArray();
                 GL.BindVertexArray(_vertexArrayObject);
+                GL.EnableVertexAttribArray(0);
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(TestVertex), 0);
                 // GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(float)*3, 0);
-                GL.VertexAttribIPointer(1, 1, VertexAttribIntegerType.Int, sizeof(TestVertex), 12);
+                GL.EnableVertexAttribArray(1);
+                GL.VertexAttribIPointer(1, 4, VertexAttribIntegerType.Int, sizeof(TestVertex), 16);
               
             }
             // Enable variable 0 in the shader.
